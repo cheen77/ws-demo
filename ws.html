@@ -1,0 +1,604 @@
+<!-- ws断线重连加心跳 -->
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Client</title>
+</head>
+<body>
+  <div id="messages"></div>
+  
+  <script>
+    const messagesDiv = document.getElementById('messages');
+    const ws = new WebSocket('ws://localhost:3000');
+
+    // 监听连接建立事件
+    ws.addEventListener('open', function(event) {
+      console.log('Connected to WebSocket server');
+      messagesDiv.innerHTML += '<p>Connected to WebSocket server</p>';
+    });
+
+    // 监听消息事件
+    ws.addEventListener('message', function(event) {
+      console.log('Received message: ' + event.data);
+      messagesDiv.innerHTML += '<p>Received message: ' + event.data + '</p>';
+    });
+
+    // 监听连接关闭事件
+    ws.addEventListener('close', function(event) {
+      console.log('Disconnected from WebSocket server');
+      messagesDiv.innerHTML += '<p>Disconnected from WebSocket server</p>';
+    });
+
+    // 发送消息到服务器
+    function sendMessage() {
+      const message = document.getElementById('messageInput').value;
+      ws.send(message);
+      console.log('Sent message: ' + message);
+      messagesDiv.innerHTML += '<p>Sent message: ' + message + '</p>';
+    }
+  </script>
+
+  <input type="text" id="messageInput" placeholder="Enter message">
+  <button onclick="sendMessage()">Send</button>
+</body>
+</html> -->
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Client</title>
+  </head>
+  <body>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Enter message" />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+      const messagesDiv = document.getElementById("messages");
+      let ws;
+
+      function connectWebSocket() {
+        ws = new WebSocket("ws://localhost:3000");
+
+        // 监听连接建立事件
+        ws.addEventListener("open", function (event) {
+          console.log("Connected to WebSocket server");
+          messagesDiv.innerHTML += "<p>Connected to WebSocket server</p>";
+        });
+
+        // 监听消息事件
+        ws.addEventListener("message", function (event) {
+          console.log("Received message: " + event.data);
+          messagesDiv.innerHTML +=
+            "<p>Received message: " + event.data + "</p>";
+        });
+
+        // 监听连接关闭事件
+        ws.addEventListener("close", function (event) {
+          console.log("Disconnected from WebSocket server");
+          messagesDiv.innerHTML += "<p>Disconnected from WebSocket server</p>";
+          // 重新连接
+          reconnectWebSocket();
+        });
+      }
+
+      // 发送消息到服务器
+      function sendMessage() {
+        const message = document.getElementById("messageInput").value;
+        ws.send(message);
+        console.log("Sent message: " + message);
+        messagesDiv.innerHTML += "<p>Sent message: " + message + "</p>";
+      }
+
+      function reconnectWebSocket() {
+        console.log("Reconnecting to WebSocket server...");
+        setTimeout(function () {
+          connectWebSocket();
+        }, 2000); // 2秒后尝试重新连接
+      }
+
+      // 初始化时连接WebSocket
+      connectWebSocket();
+    </script>
+  </body>
+</html> -->
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Client</title>
+  </head>
+  <body>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Enter message" />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+      const messagesDiv = document.getElementById("messages");
+      let ws;
+      let heartbeatInterval;
+
+      function connectWebSocket() {
+        ws = new WebSocket("ws://localhost:3000");
+
+        // 监听连接建立事件
+        ws.addEventListener("open", function (event) {
+          console.log("Connected to WebSocket server");
+          messagesDiv.innerHTML += "<p>Connected to WebSocket server</p>";
+          startHeartbeat();
+        });
+
+        // 监听消息事件
+        ws.addEventListener("message", function (event) {
+            console.log("event",event);
+          console.log("Received message: " + event.data);
+          messagesDiv.innerHTML +=
+            "<p>Received message: " + event.data + "</p>";
+          // 收到消息时重置心跳计时
+          resetHeartbeat();
+        });
+
+        // 监听连接关闭事件
+        ws.addEventListener("close", function (event) {
+          console.log("Disconnected from WebSocket server");
+          messagesDiv.innerHTML += "<p>Disconnected from WebSocket server</p>";
+          // 停止心跳
+          stopHeartbeat();
+          // 重新连接
+          reconnectWebSocket();
+        });
+      }
+
+      // 发送消息到服务器
+      function sendMessage() {
+        const message = document.getElementById("messageInput").value;
+        ws.send(message);
+        console.log("Sent message: " + message);
+        messagesDiv.innerHTML += "<p>Sent message: " + message + "</p>";
+      }
+
+      function startHeartbeat() {
+        heartbeatInterval = setInterval(function () {
+          // 发送心跳消息
+          ws.send("heartbeat");
+          console.log("Sent heartbeat");
+        }, 5000); // 每隔5秒发送一次心跳消息
+      }
+
+      function resetHeartbeat() {
+        clearInterval(heartbeatInterval);
+        startHeartbeat();
+      }
+
+      function stopHeartbeat() {
+        clearInterval(heartbeatInterval);
+      }
+
+      function reconnectWebSocket() {
+        console.log("Reconnecting to WebSocket server...");
+        setTimeout(function () {
+          connectWebSocket();
+        }, 2000); // 2秒后尝试重新连接
+      }
+
+      // 初始化时连接WebSocket
+      connectWebSocket();
+    </script>
+  </body>
+</html> -->
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Client</title>
+  </head>
+  <body>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Enter message" />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+      const messagesDiv = document.getElementById("messages");
+      let ws;
+      let heartbeatInterval;
+
+      function connectWebSocket() {
+        ws = new WebSocket("ws://localhost:3000");
+
+        ws.addEventListener("open", function (event) {
+          console.log("Connected to WebSocket server");
+          messagesDiv.innerHTML += "<p>Connected to WebSocket server</p>";
+          startHeartbeat();
+        });
+
+        ws.addEventListener("message", function (event) {
+          console.log("Received message:", event);
+          const message = JSON.parse(event.data);
+          if (message.type === "chat") {
+            messagesDiv.innerHTML +=
+              "<p>Received message: " + message.text + "</p>";
+            resetHeartbeat();
+          }
+        });
+
+        ws.addEventListener("close", function (event) {
+          console.log("Disconnected from WebSocket server");
+          messagesDiv.innerHTML += "<p>Disconnected from WebSocket server</p>";
+          stopHeartbeat();
+          reconnectWebSocket();
+        });
+      }
+
+      function sendMessage() {
+        const message = document.getElementById("messageInput").value;
+        ws.send(JSON.stringify({ type: "chat", text: message }));
+        console.log("Sent message: " + message);
+        messagesDiv.innerHTML += "<p>Sent message: " + message + "</p>";
+      }
+
+      function startHeartbeat() {
+        heartbeatInterval = setInterval(function () {
+          ws.send(JSON.stringify({ type: "heartbeat" }));
+          console.log("Sent heartbeat");
+        }, 5000);
+      }
+
+      function resetHeartbeat() {
+        clearInterval(heartbeatInterval);
+        startHeartbeat();
+      }
+
+      function stopHeartbeat() {
+        clearInterval(heartbeatInterval);
+      }
+
+      function reconnectWebSocket() {
+        console.log("Reconnecting to WebSocket server...");
+        setTimeout(function () {
+          connectWebSocket();
+        }, 2000);
+      }
+
+      connectWebSocket();
+    </script>
+  </body>
+</html> -->
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Client</title>
+  </head>
+  <body>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Enter message" />
+    <button onclick="sendMessage()">Send</button>
+    <button onclick="closeWebSocket()">Close WebSocket</button>
+    <button onclick="cancelReconnect()">Cancel Reconnect</button>
+
+    <script>
+      const messagesDiv = document.getElementById("messages");
+      let ws;
+      let heartbeatInterval;
+      let shouldReconnect = true;
+
+      function connectWebSocket() {
+        ws = new WebSocket("ws://localhost:3000");
+
+        ws.addEventListener("open", function (event) {
+          console.log("Connected to WebSocket server");
+          messagesDiv.innerHTML += "<p>Connected to WebSocket server</p>";
+          startHeartbeat();
+        });
+
+        ws.addEventListener("message", function (event) {
+          console.log("Received message:", event.data);
+          const message = JSON.parse(event.data);
+          if (message.type === "chat") {
+            messagesDiv.innerHTML +=
+              "<p>Received message: " + message.text + "</p>";
+            resetHeartbeat();
+          }
+        });
+
+        ws.addEventListener("close", function (event) {
+          console.log("Disconnected from WebSocket server");
+          messagesDiv.innerHTML += "<p>Disconnected from WebSocket server</p>";
+          stopHeartbeat();
+          if (shouldReconnect) {
+            reconnectWebSocket();
+          }
+        });
+      }
+
+      function sendMessage() {
+        const message = document.getElementById("messageInput").value;
+        ws.send(JSON.stringify({ type: "chat", text: message }));
+        console.log("Sent message: " + message);
+        messagesDiv.innerHTML += "<p>Sent message: " + message + "</p>";
+      }
+
+      function startHeartbeat() {
+        heartbeatInterval = setInterval(function () {
+          ws.send(JSON.stringify({ type: "heartbeat" }));
+          console.log("Sent heartbeat");
+        }, 5000);
+      }
+
+      function resetHeartbeat() {
+        clearInterval(heartbeatInterval);
+        startHeartbeat();
+      }
+
+      function stopHeartbeat() {
+        clearInterval(heartbeatInterval);
+      }
+
+      function closeWebSocket() {
+        shouldReconnect = false; // 关闭 WebSocket 连接后取消重连
+        ws.close();
+      }
+
+      function cancelReconnect() {
+        shouldReconnect = false; // 取消重连
+      }
+
+      function reconnectWebSocket() {
+        console.log("Reconnecting to WebSocket server...");
+        setTimeout(function () {
+          connectWebSocket();
+        }, 2000);
+      }
+
+      connectWebSocket();
+    </script>
+  </body>
+</html> -->
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Client</title>
+  </head>
+  <body>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Enter message" />
+    <button onclick="sendMessage()">Send</button>
+    <button onclick="closeWebSocket()">Close WebSocket</button>
+    <button onclick="cancelReconnect()">Cancel Reconnect</button>
+    <button onclick="openWebSocket()">Open WebSocket</button>
+    <button onclick="openReconnect()">Open Reconnect</button>
+
+    <script>
+      const messagesDiv = document.getElementById("messages");
+      let ws;
+      let heartbeatInterval;
+      let shouldReconnect = true;
+
+      function connectWebSocket() {
+        ws = new WebSocket("ws://localhost:3000");
+
+        ws.addEventListener("open", function (event) {
+          console.log("Connected to WebSocket server");
+          messagesDiv.innerHTML += "<p>Connected to WebSocket server</p>";
+          startHeartbeat();
+        });
+
+        ws.addEventListener("message", function (event) {
+          console.log("Received message:", event.data);
+          const message = JSON.parse(event.data);
+          if (message.type === "chat") {
+            messagesDiv.innerHTML +=
+              "<p>Received message: " + message.text + "</p>";
+            resetHeartbeat();
+          }
+        });
+
+        ws.addEventListener("close", function (event) {
+          console.log("Disconnected from WebSocket server");
+          messagesDiv.innerHTML += "<p>Disconnected from WebSocket server</p>";
+          stopHeartbeat();
+          if (shouldReconnect) {
+            reconnectWebSocket();
+          }
+        });
+      }
+
+      function sendMessage() {
+        const message = document.getElementById("messageInput").value;
+        ws.send(JSON.stringify({ type: "chat", text: message }));
+        console.log("Sent message: " + message);
+        messagesDiv.innerHTML += "<p>Sent message: " + message + "</p>";
+      }
+
+      function startHeartbeat() {
+        heartbeatInterval = setInterval(function () {
+          ws.send(JSON.stringify({ type: "heartbeat" }));
+          console.log("Sent heartbeat");
+        }, 5000);
+      }
+
+      function resetHeartbeat() {
+        clearInterval(heartbeatInterval);
+        startHeartbeat();
+      }
+
+      function stopHeartbeat() {
+        clearInterval(heartbeatInterval);
+      }
+
+      function closeWebSocket() {
+        shouldReconnect = false; // 关闭 WebSocket 连接后取消重连
+        ws.close();
+      }
+
+      function cancelReconnect() {
+        shouldReconnect = false; // 取消重连
+      }
+
+      function openWebSocket() {
+        shouldReconnect = true; // 打开 WebSocket 连接时允许重连
+        connectWebSocket();
+      }
+
+      function openReconnect() {
+        shouldReconnect = true; // 打开重连
+        reconnectWebSocket();
+      }
+
+      function reconnectWebSocket() {
+        console.log("Reconnecting to WebSocket server...");
+        setTimeout(function () {
+          connectWebSocket();
+        }, 2000);
+      }
+
+      // 初始化时连接 WebSocket
+      connectWebSocket();
+    </script>
+  </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Client</title>
+  </head>
+  <style>
+    #messages {
+      height: 300px;
+      width: 612px;
+      overflow: auto;
+      border: 1px dashed #ccc;
+    }
+  </style>
+  <body>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Enter message" />
+    <button onclick="sendMessage()">Send</button>
+    <button onclick="closeWebSocket()">Close WebSocket</button>
+    <button onclick="toggleReconnect()">Toggle Heartbeat</button>
+    <button onclick="openWebSocket()">Open WebSocket</button>
+
+    <script>
+      const messagesDiv = document.getElementById("messages");
+      let ws;
+      let heartbeatInterval;
+      let shouldReconnect = true;
+
+      function connectWebSocket() {
+        ws = new WebSocket("ws://localhost:3000");
+
+        ws.addEventListener("open", function (event) {
+          console.log("Connected to WebSocket server");
+          messagesDiv.innerHTML += "<p>Connected to WebSocket server</p>";
+          startHeartbeat();
+        });
+
+        ws.addEventListener("message", function (event) {
+          console.log("Received message:", event.data);
+          const message = JSON.parse(event.data);
+          if (message.type === "chat") {
+            messagesDiv.innerHTML +=
+              "<p>Received message: " + message.text + "</p>";
+            resetHeartbeat();
+          }
+          //   else if (message.type === "reconnect") {
+          //     console.log(
+          //       "Received reconnect signal from server. Reconnecting..."
+          //     );
+          //     reconnectWebSocket();
+          //   }
+        });
+
+        ws.addEventListener("close", function (event) {
+          console.log("Disconnected from WebSocket server");
+          messagesDiv.innerHTML += "<p>Disconnected from WebSocket server</p>";
+          stopHeartbeat();
+          if (shouldReconnect) {
+            reconnectWebSocket();
+          }
+        });
+
+        ws.addEventListener("error", function (event) {
+          console.error("WebSocket error:", event);
+          // 可以在这里处理错误，例如无法连接到服务器、连接中断等，以及WebSocket API本身的一些限制和错误。
+        });
+      }
+
+      function sendMessage() {
+        const message = document.getElementById("messageInput").value;
+        ws.send(JSON.stringify({ type: "chat", text: message }));
+        console.log("Sent message: " + message);
+        messagesDiv.innerHTML += "<p>Sent message: " + message + "</p>";
+      }
+
+      function startHeartbeat() {
+        heartbeatInterval = setInterval(function () {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: "heartbeat" }));
+            console.log("Sent heartbeat");
+          } else {
+            console.log("WebSocket connection is not open");
+          }
+        }, 5000);
+      }
+
+      function resetHeartbeat() {
+        clearInterval(heartbeatInterval);
+        if (shouldReconnect) {
+          startHeartbeat();
+        }
+      }
+
+      function stopHeartbeat() {
+        clearInterval(heartbeatInterval);
+      }
+
+      function closeWebSocket() {
+        shouldReconnect = false; // 关闭 WebSocket 连接后取消重连
+        ws.close();
+      }
+
+      function toggleReconnect() {
+        shouldReconnect = !shouldReconnect; // 切换重连选项
+        console.log("Reconnect is", shouldReconnect ? "enabled" : "disabled");
+        if (!shouldReconnect) {
+          stopHeartbeat();
+        } else {
+          startHeartbeat();
+        }
+      }
+
+      function openWebSocket() {
+        shouldReconnect = true; // 打开 WebSocket 连接时允许重连
+        connectWebSocket();
+      }
+
+      function reconnectWebSocket() {
+        console.log("Reconnecting to WebSocket server...");
+        setTimeout(function () {
+          connectWebSocket();
+        }, 2000);
+      }
+
+      // 初始化时连接 WebSocket
+      connectWebSocket();
+    </script>
+  </body>
+</html>
